@@ -1,4 +1,4 @@
-# Projeto Chat Bot com API Gemini
+# Projeto ChatBot com API Gemini
 
 Este é um projeto de chatbot utilizando a API Gemini e Python.
 
