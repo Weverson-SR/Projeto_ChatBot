@@ -1,6 +1,7 @@
 import google.generativeai as genai
 from dotenv import load_dotenv
 import os
+import streamlit as st
 
 
 class GeminiChat:
@@ -101,7 +102,47 @@ class GeminiChat:
             del self.model  # Libera o modelo
 
 
+class StreamlitInterface:
+
+    def __init__(self, gemini_instance):
+        """Inicializa a interface do Streamlit com uma instância de GeminiChat."""
+        self.gemini = gemini_instance
+
+    def iniciar(self):
+        """Configura e executa a interface Streamlit."""
+        st.title("ChatBot com Gemini")
+        st.write("Bem-vindo! Converse com o Gemini")
+
+        # Criando um histórico da sessão (efeito chatgpt)
+        if "chat_history" not in st.session_state:
+            st.session_state.chat_history = []
+
+        # Input do usuário
+        user_input = st.text_input("Digite sua mensagem:", key="user_input", placeholder="Digite algo...")
+
+        if user_input:  # Quando o usuário envia uma mensagem
+
+            # Adiciona a mensagem do usuário ao histórico
+            st.session_state.chat_history.append({"user": user_input})
+
+            # Gera a resposta do Gemini
+            resposta = self.gemini.gerar_resposta(user_input)
+
+            # Adiciona a resposta ao histórico
+            st.session_state.chat_history.append({"gemini": resposta})
+
+            # Exibe o histórico de conversa
+        for mensagem in st.session_state.chat_history:
+            if "user" in mensagem:
+                st.write(f"**Você:** {mensagem['user']}")
+            elif "gemini" in mensagem:
+                st.write(f"**Gemini:** {mensagem['gemini']}")
+
+
 if __name__ == "__main__":
-    # Fluxo principal do programa
-    chat = GeminiChat()
-    chat.iniciar_conversa()
+    # Inicializa o GeminiChat
+    gemini_chat = GeminiChat()
+
+    # Inicializa a interface do Streamlit com a instância do GeminiChat
+    interface = StreamlitInterface(gemini_chat)
+    interface.iniciar()
