@@ -103,40 +103,103 @@ class GeminiChat:
 
 
 class StreamlitInterface:
-
     def __init__(self, gemini_instance):
-        """Inicializa a interface do Streamlit com uma instância de GeminiChat."""
         self.gemini = gemini_instance
 
-    def iniciar(self):
-        """Configura e executa a interface Streamlit."""
-        st.title("ChatBot com Gemini")
-        st.write("Bem-vindo! Converse com o Gemini")
-
-        # Criando um histórico da sessão (efeito chatgpt)
-        if "chat_history" not in st.session_state:
-            st.session_state.chat_history = []
-
-        # Input do usuário
-        user_input = st.text_input("Digite sua mensagem:", key="user_input", placeholder="Digite algo...")
-
-        if user_input:  # Quando o usuário envia uma mensagem
-
-            # Adiciona a mensagem do usuário ao histórico
+    def handle_input(self):
+        # Verifica se o usuário digitou algo
+        user_input = st.session_state.get("user_input", "")
+        if user_input:
+            # Adiciona a mensagem ao histórico
             st.session_state.chat_history.append({"user": user_input})
 
             # Gera a resposta do Gemini
             resposta = self.gemini.gerar_resposta(user_input)
 
-            # Adiciona a resposta ao histórico
+            # Adiciona a resposta do Gemini ao histórico
             st.session_state.chat_history.append({"gemini": resposta})
 
-            # Exibe o histórico de conversa
-        for mensagem in st.session_state.chat_history:
-            if "user" in mensagem:
-                st.write(f"**Você:** {mensagem['user']}")
-            elif "gemini" in mensagem:
-                st.write(f"**Gemini:** {mensagem['gemini']}")
+            # Limpa a entrada do usuário
+            st.session_state.user_input = ""
+
+    def iniciar(self):
+        st.sidebar.title("Barra Lateral")
+        st.sidebar.write("Essa é uma sidebar vazia. Adicione elementos aqui para testes.")
+        st.title("Chat com Gemini")
+        st.write("Bem-vindo! Converse com o Gemini abaixo.")
+
+        # Inicializa o histórico na sessão
+        if "chat_history" not in st.session_state:
+            st.session_state.chat_history = []
+
+        # Exibe o histórico de mensagens em um container
+        with st.container():
+            for i, mensagem in enumerate(st.session_state.chat_history):
+                if "user" in mensagem:
+                    st.markdown(
+                        f"<p style='color: blue;'><b>Você:</b> {mensagem['user']}</p>",
+                        unsafe_allow_html=True,
+                    )
+                elif "gemini" in mensagem:
+                    st.markdown(
+                        f"<p style='color: green;'><b>Gemini:</b> {mensagem['gemini']}</p>",
+                        unsafe_allow_html=True,
+                    )
+
+        # Caixa de entrada do usuário com callback
+        st.text_input(
+            "Digite sua mensagem aqui",
+            placeholder="Pressione Enter para enviar",
+            key="user_input",
+            on_change=self.handle_input,  # Chama a função ao enviar a mensagem
+        )
+
+        # Força o scroll para a mensagem mais recente
+        scroll_script = """
+        <script>
+            var chatBox = window.parent.document.body;
+            chatBox.scrollTop = chatBox.scrollHeight;
+        </script>
+        """
+        st.markdown(scroll_script, unsafe_allow_html=True)
+
+        # Ajuste de estilo para manter a caixa no final da página
+        st.markdown("""
+            <style>
+                /* Estilo para manter a caixa de mensagem fixa no rodapé */
+                .stTextInput {
+                    position: fixed; /* Fixa a posição no rodapé */
+                    bottom: 0; /* Garante que esteja no fundo */
+                    max-width: 600px; /* Largura máxima */
+                    width: 100%; /* Ajusta à largura total do container */
+                    margin: 0 auto; /* Centraliza horizontalmente */
+                }
+            </style>
+        """, unsafe_allow_html=True)
+
+        # Ajustando e modelando a caixa de mensagem # Era para ser isso ne pqp, não funciona
+        st.markdown("""
+            <style>
+                .stTextArea{
+                    display:flex;
+                    justify-content:content;
+                    flex-direction: column;
+                    width: 100%
+                }
+                 .stTextArea textarea {
+                    white-space: pre-line; /* Permite a quebra automática */
+                    word-wrap: break-word; /* Quebra as palavras longas */
+                    height: 50px;
+                    max-height: 150px;
+                    resize: none;
+                    overflow-y: auto;
+                    padding: 10px;
+                    font-size: 14px;
+                    border: 1px solid #ccc;
+                    border-radius: 5px;
+                }
+            </style>
+        """, unsafe_allow_html=True)
 
 
 if __name__ == "__main__":
