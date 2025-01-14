@@ -132,19 +132,37 @@ class StreamlitInterface:
         if "chat_history" not in st.session_state:
             st.session_state.chat_history = []
 
-        # Exibe o histórico de mensagens em um container
+        # Markdown para mudar o fundo das mensagens tanto do usuário como do gemini
+        st.markdown("""
+            <style>
+                .user-message {
+                    background-color: rgba(102, 102, 102, 0.05);  /* Fundo cinza claro */
+                    padding: 10px;  /* Espaçamento interno */
+                    border-radius: 5px;  /* Borda arredondada */
+                    margin-bottom: 5px;  /* Espaçamento entre as mensagens */
+                    font-size: 14px;  /* Ajuste do tamanho da fonte */
+                }
+
+                .gemini-message {
+                    background-color: rgba(160, 160, 160, 0.05);  /* Fundo verde claro para as mensagens do Gemini */
+                    padding: 10px;
+                    border-radius: 5px;
+                    margin-bottom: 5px;
+                    font-size: 14px;
+                }
+            </style>
+        """, unsafe_allow_html=True)
+
+        # Exibição das mensagens com o estilo
         with st.container():
             for i, mensagem in enumerate(st.session_state.chat_history):
                 if "user" in mensagem:
-                    st.markdown(
-                        f"<p style='color: blue;'><b>Você:</b> {mensagem['user']}</p>",
-                        unsafe_allow_html=True,
-                    )
+                    # Aplica a classe user-message para as mensagens do usuário
+                    st.markdown(f"<p class='user-message'><b>Você:</b> {mensagem['user']}</p>", unsafe_allow_html=True)
                 elif "gemini" in mensagem:
-                    st.markdown(
-                        f"<p style='color: green;'><b>Gemini:</b> {mensagem['gemini']}</p>",
-                        unsafe_allow_html=True,
-                    )
+                    # Aplica a classe gemini-message para as mensagens do Gemini
+                    st.markdown(f"<p class='gemini-message'><b>Gemini:</b> {mensagem['gemini']}</p>",
+                                unsafe_allow_html=True)
 
         # Caixa de entrada do usuário com callback
         st.text_input(
@@ -170,7 +188,7 @@ class StreamlitInterface:
                 .stTextInput {
                     position: fixed; /* Fixa a posição no rodapé */
                     bottom: 0; /* Garante que esteja no fundo */
-                    max-width: 600px; /* Largura máxima */
+                    max-width: 700px; /* Largura máxima */
                     width: 100%; /* Ajusta à largura total do container */
                     margin: 0 auto; /* Centraliza horizontalmente */
                 }
