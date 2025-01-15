@@ -123,33 +123,31 @@ class StreamlitInterface:
             st.session_state.user_input = ""
 
     def iniciar(self):
-        st.sidebar.title("Barra Lateral")
-        st.sidebar.write("Essa é uma sidebar vazia. Adicione elementos aqui para testes.")
-        st.title("Chat com Gemini")
-        st.write("Bem-vindo! Converse com o Gemini abaixo.")
+        st.sidebar.title("Chat com Gemini")
+        st.sidebar.write("Tire suas dúvidas e seja direto!"
+                         "Estamos trabalhando para que ele se lembre de suas mensagens.")
+        st.sidebar.write("Talvez um contador de tokens aqui?")
+        st.title("No que posso ajudar?")
 
         # Inicializa o histórico na sessão
         if "chat_history" not in st.session_state:
             st.session_state.chat_history = []
 
-        # Markdown para mudar o fundo das mensagens tanto do usuário como do gemini
+        # Markdown para mudar o fundo das mensagens tanto do usuário quanto do gemini
         st.markdown("""
             <style>
                 .user-message {
-                    background-color: rgba(102, 102, 102, 0.05);  /* Fundo cinza claro */
+                    background-color: rgba(102, 102, 102, 0.1);  /* Fundo cinza claro */
                     padding: 10px;  /* Espaçamento interno */
                     border-radius: 5px;  /* Borda arredondada */
                     margin-bottom: 5px;  /* Espaçamento entre as mensagens */
                     font-size: 14px;  /* Ajuste do tamanho da fonte */
                 }
-
+                
                 .gemini-message {
-                    background-color: rgba(160, 160, 160, 0.05);  /* Fundo verde claro para as mensagens do Gemini */
-                    padding: 10px;
-                    border-radius: 5px;
-                    margin-bottom: 5px;
-                    font-size: 14px;
+                    padding:10px
                 }
+
             </style>
         """, unsafe_allow_html=True)
 
