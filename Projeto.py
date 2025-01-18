@@ -43,6 +43,7 @@ class GeminiChat:
 class StreamlitInterface:
     def __init__(self, gemini_instance):
         self.gemini = gemini_instance
+        self.total_tokens = 0
 
     def handle_input(self):
         """Gerencia a entrada do usuário no Streamlit."""
@@ -64,15 +65,39 @@ class StreamlitInterface:
                 # Em caso de erro, mostra no Streamlit
                 st.session_state.chat_history.append({"gemini": f"Erro ao gerar resposta: {e}"})
 
-            # Limpa o campo de entrada do usuário
-            st.session_state.user_input = ""
+            # Calcula o número de tokens da mensagem do usuário
+            user_tokens = len(input_usuario.split())
+
+            # Gera a resposta do Gemini
+            resposta_gemini = self.gemini.gerar_resposta(input_usuario)
+
+            # Calcula o número de tokens da resposta do Gemini
+            gemini_tokens = len(resposta_gemini.split())
+
+            # Soma os tokens da mensagem do usuário e da resposta do Gemini
+            total_tokens = user_tokens + gemini_tokens
+
+            # Soma o total de tokens da conversa
+            self.total_tokens += total_tokens
+
+            # Atualiza o contador
+            st.session_state["total_tokens"] += total_tokens
 
     def iniciar(self):
         st.sidebar.title("Chat com Gemini")
         st.sidebar.write("Tire suas dúvidas e seja direto!"
                          "Estamos trabalhando para que ele se lembre de suas mensagens.")
-        st.sidebar.write("Talvez um contador de tokens aqui?")
         st.title("No que posso ajudar?")
+
+        def get_contador():
+            if "total_tokens" not in st.session_state:
+                st.session_state["total_tokens"] = 0
+            return st.session_state["total_tokens"]
+
+        st.sidebar.write(f"Contador de tokens: {get_contador()}")
+
+        if "total_tokens" not in st.session_state:
+            st.session_state.total_tokens = 0
 
         # Inicializa o histórico na sessão
         if "chat_history" not in st.session_state:
