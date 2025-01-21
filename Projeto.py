@@ -2,6 +2,7 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 import os
 import streamlit as st
+import sqlite3
 
 
 class GeminiChat:
@@ -153,6 +154,11 @@ class StreamlitInterface:
                 }
             </style>
         """, unsafe_allow_html=True)
+
+
+class Sqlite:
+    def __init__(self):
+        pass
 
 
 if __name__ == "__main__":
