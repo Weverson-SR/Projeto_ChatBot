@@ -90,24 +90,45 @@ class StreamlitInterface:
             elif "gemini" in mensagem:
                 st.markdown(f'<div class="gemini-message">{mensagem["gemini"]}</div>', unsafe_allow_html=True)
 
+    import streamlit as st
+
     def handle_input(self):
         """Gerencia a entrada do usuário no Streamlit."""
-        input_usuario = st.text_input("Digite sua mensagem:", placeholder="Digite aqui...")
-        if input_usuario:
-            st.session_state.chat_history.append({"user": input_usuario})
+
+        def capturar_mensagem():
+            mensagem = st.session_state.input_usuario
+            st.session_state.chat_history.append({"user": mensagem})
             if self.gemini is None:
                 st.error("Erro: A instância do Gemini ainda não foi iniciada.")
                 return
             try:
-                resposta_gemini = self.gemini.gerar_resposta(input_usuario)
+                resposta_gemini = self.gemini.gerar_resposta(mensagem)
                 st.session_state.chat_history.append({"gemini": resposta_gemini})
-                self.total_tokens += len(input_usuario.split()) + len(resposta_gemini.split())
+                self.total_tokens += len(mensagem.split()) + len(resposta_gemini.split())
                 st.session_state["total_tokens"] = self.total_tokens
             except Exception as e:
                 print(f"Erro ao gerar resposta: {e}")
+            st.session_state.input_usuario = ""
+
+        # Aplicar o estilo CSS para manter a caixa de texto fixa no rodapé
+        st.markdown("""
+            <style>
+                /* Estilo para manter a caixa de mensagem fixa no rodapé */
+                .stTextInput {
+                    position: fixed; /* Fixa a posição no rodapé */
+                    bottom: 65px; /* Garante que esteja no fundo */
+                    max-width: 700px; /* Largura máxima */
+                    width: 100%; /* Ajusta à largura total do container */
+                    margin: 0 auto; /* Centraliza horizontalmente */
+                } 
+            </style>
+        """, unsafe_allow_html=True)
+
+        st.text_input("Digite sua mensagem:", placeholder="Digite aqui...", key="input_usuario",
+                      on_change=capturar_mensagem)
 
 
-# Markdown para mudar o fundo das mensagens tanto do usuário quanto do gemini
+    # Markdown para mudar o fundo das mensagens tanto do usuário quanto do gemini
     st.markdown("""
         <style>
             .user-message {
@@ -124,7 +145,6 @@ class StreamlitInterface:
 
         </style>
     """, unsafe_allow_html=True)
-
 
 class Sqlite:
     def __init__(self):
