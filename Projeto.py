@@ -46,14 +46,14 @@ class StreamlitInterface:
         self.json_usuario = JsonUsuario()
 
     def iniciar(self):
-        st.sidebar.title("Chat com Gemini")
-        st.sidebar.write("Tire suas dúvidas e seja direto!")
+        st.sidebar.title("ChatBot Pessoal")
+        st.sidebar.write("Seja direto nas suas perguntas!")
         st.title("No que posso ajudar?")
 
         self.exibir_formulario_necessario()
 
         if st.session_state.get("formulario_preenchido", False):
-            st.write("Agora você pode conversar com o Gemini!")
+            st.write("Agora você pode conversar com o ChatBot!")
             self.handle_input()
             self.exibir_historico_chat()
 
@@ -110,37 +110,48 @@ class StreamlitInterface:
                 print(f"Erro ao gerar resposta: {e}")
             st.session_state.input_usuario = ""
 
+            # Exibe um alerta quando o usuário chega a 800 mil tokens
+            if self.total_tokens > 800_000:
+                st.warning("O limite de tokens está perto de ser atingido. Você pode ser cobrado!")
+
         # Aplicar o estilo CSS para manter a caixa de texto fixa no rodapé
         st.markdown("""
             <style>
                 /* Estilo para manter a caixa de mensagem fixa no rodapé */
                 .stTextInput {
                     position: fixed; /* Fixa a posição no rodapé */
-                    bottom: 65px; /* Garante que esteja no fundo */
+                    bottom: 20px; /* Garante que esteja no fundo */
                     max-width: 700px; /* Largura máxima */
                     width: 100%; /* Ajusta à largura total do container */
                     margin: 0 auto; /* Centraliza horizontalmente */
-                } 
+                    height: auto; /* Ajusta a altura automaticamente */
+                    padding: 5px; /* Adiciona espaço interno */
+                    font-size: 20px; /* Define o tamanho da fonte */   
+                    
+                    
+                }  
             </style>
         """, unsafe_allow_html=True)
 
-        st.text_input("Digite sua mensagem:", placeholder="Digite aqui...", key="input_usuario",
-                      on_change=capturar_mensagem)
-
+        # Caixa para o usuário enviar a mensagem
+        st.text_input("Digite sua mensagem", placeholder="Digite aqui...", key="input_usuario",
+                      on_change=capturar_mensagem, label_visibility="collapsed")
 
     # Markdown para mudar o fundo das mensagens tanto do usuário quanto do gemini
     st.markdown("""
         <style>
             .user-message {
-                background-color: rgba(102, 102, 102, 0.1);  /* Fundo cinza claro */
-                padding: 10px;  /* Espaçamento interno */
-                border-radius: 5px;  /* Borda arredondada */
-                margin-bottom: 5px;  /* Espaçamento entre as mensagens */
+                background-color: rgba(102, 102, 102, 1);  /* Fundo cinza claro */
+                padding: 20px;  /* Espaçamento interno */
+                border-radius: 10px;  /* Borda arredondada */
+                  /* Espaçamento entre as mensagens */
                 font-size: 14px;  /* Ajuste do tamanho da fonte */
             }
 
             .gemini-message {
-                padding: 10px;
+                padding: 20px;
+                background-color: rgb(26, 28, 36, 1.5);
+                border-radius: 10px;
             }
 
         </style>
@@ -186,7 +197,6 @@ class Sqlite:
         self.cursor.execute("""UPDATE usuario SET gemini_token = ? WHERE nome = ?""",
                             (chave_api_formulario, nome_usuario_formulario))
         self.conn.commit()
-
 
 class JsonUsuario:
 
