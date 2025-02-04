@@ -2,6 +2,7 @@ import streamlit as st
 import google.generativeai as genai
 import sqlite3
 import json
+import time
 
 class GeminiChat:
 
@@ -52,6 +53,9 @@ class StreamlitInterface:
 
         self.exibir_formulario_necessario()
 
+        if 'recarregar' not in st.session_state:
+            st.session_state.refresh = False
+
         if st.session_state.get("formulario_preenchido", False):
             st.write("Agora você pode conversar com o ChatBot!")
             self.handle_input()
@@ -59,7 +63,7 @@ class StreamlitInterface:
 
     def exibir_formulario_necessario(self):
         if not self.sqlite.existe_usuario():
-            with st.expander("Formulario"):
+            with st.expander("Cadastro"):
                 with st.form("formulario"):
                     st.subheader("Insira seus dados")
                     self.nome_usuario_formulario = st.text_input("Nome:", placeholder="Digite seu nome")
@@ -70,14 +74,17 @@ class StreamlitInterface:
                         if not self.nome_usuario_formulario or not self.chave_api_formulario:
                             st.error("Preencha todos os campos antes de salvar!")
                             return
+
                         # Salva a chave API e o nome do usuário no banco de dados
                         self.sqlite.insira_usuario(self.nome_usuario_formulario, self.chave_api_formulario)
                         # Salva os dados do usuário no arquivo JSON
                         self.json_usuario.nome_usuario = self.nome_usuario_formulario
                         self.json_usuario.chave_api = self.chave_api_formulario
                         self.json_usuario.salvar_dados()
-                        st.success("Dados salvos com sucesso!")
+
+                        st.success("Dados salvos com sucesso!Recarregue a página para iniciar a conversa.")
                         st.session_state.formulario_preenchido = True
+
         else:
             st.session_state.formulario_preenchido = True
 
