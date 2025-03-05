@@ -61,6 +61,8 @@ Antes de usar a aplicação, você precisa criar sua chave de API do Gemini. Sig
 
 
 - Criação de uma interface gráfica utilizando `Tkinter`, `PyQt`, ou outras bibliotecas nativas do Python.
+  
+- Uma nova versão já está sendo feita: [Mentris](https://github.com/Weverson-SR/Mentris)
 
 ## Contribuição
 
